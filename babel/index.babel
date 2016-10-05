@@ -1,0 +1,138 @@
+  const {
+    Modal,
+    Input,
+    Button
+  } = ReactBootstrap;
+
+  var modalName = "Add New Recipe";
+  var editRecipe = "";
+  var editIngredient = [];
+
+  var Recipes = React.createClass({
+  // hook up data model
+  getInitialState: function() {
+    return {
+      recipeStorageKey: "_malekai_recipes",
+      showModal: false,
+      editing: false,
+      recipeList: [
+          {recipe: "Malek's Protein Shake", ingredients: ['1 Glass of Whole Milk', '6 tablespoons of Peanut Butter', '1 scoop of Whey', '2 Bananas', '1 scoop of Vanilla Ice Cream']},
+          {recipe: 'Pumpkin Pie', ingredients: ['Pumpkin Puree', 'Sweetened Condensed Milk', 'Eggs', 'Pumpkin Pie Spice', 'Pie Crust']},
+          {recipe: 'Spaghetti with fried eggs', ingredients: ['Noodles', 'Tomato Sauce', 'Meatballs', '4 eggs', 'Ground black pepper']}
+        ]
+    }
+  },
+
+  componentDidMount: function() {
+   var recipesStore = localStorage.getItem(this.recipeStorageKey);
+   if (recipesStore)
+      this.setState({recipes: JSON.parse(recipesStore)});
+  },
+
+  ingredientList: function(ingredients) {
+   return ingredients.map((ingredient, i) => {
+    return (<li key={i} index={i} className="list-group-item">{ingredient}</li>)
+   })
+  },
+
+  eachRecipe: function(item, i) {
+    return (
+        <div key={i} index={i} className="panel panel-default">
+          <div className="panel-heading"><h3 className="panel-title">{item.recipe}</h3></div>
+          <div className="panel-body">
+            <ul className="list-group">
+              {this.ingredientList(item.ingredients)}
+            </ul>
+            <button name={i} onClick={this.edit.bind(this, i)} type="button" className="btn-sm btn-info" data-toggle="modal" data-target="#myModal">Edit</button>
+            <button onClick={this.remove.bind(this, i)} type="button" className="btn-sm btn-danger">Remove</button>
+          </div>
+        </div>
+    )
+  },
+
+  add: function() {
+    var i = this.state.editIdx;
+    var name = this.refs.userVal.value;
+    var items = this.refs.newIngredients.value.split(",");
+    if (this.state.editing) {
+      var arr = this.state.recipeList.slice();
+      arr[i] = { recipe: name, ingredients: items };
+      this.setState({recipeList: arr});
+    }
+    else {
+      this.setState({recipeList: [...this.state.recipeList, { recipe: name, ingredients: items }]})
+    }
+    this.close();
+  },
+
+  edit: function(i, recipe, ingredients) {
+    this.setState({
+      editing: true,
+      editIdx: i
+    });
+    this.open();
+    modalName = "Edit";
+    var arr = this.state.recipeList.slice();
+    editRecipe = arr[i].recipe;
+    editIngredient = arr[i].ingredients;
+  },
+
+  remove: function(i) {
+    var arr = this.state.recipeList.slice(); //copy array
+    arr.splice(i, 1); //remove element
+    this.setState({recipeList: arr}); //update state
+  },
+
+  close() {
+    this.setState({editing: false});
+    this.setState({ showModal: false });
+    modalName = "Add New Recipe";
+    editRecipe = "";
+    editIngredient = "";
+  },
+
+  open() {
+    this.setState({ showModal: true });
+  },
+
+  render: function() {
+      return (
+        <div>
+        <div>
+        <button onClick={this.open} type="button" className="btn btn-success btn-lg" data-toggle="modal" data-target="#myModal">Add Recipe</button>
+        <Modal show={this.state.showModal} onHide={this.close}>
+          <Modal.Header closeButton>
+            <Modal.Title>{modalName}</Modal.Title>
+          </Modal.Header>
+          <Modal.Body>
+            <form>
+              <div className="form-group">
+                <label for="name">Recipe</label>
+                <input type="text" ref="userVal" className="form-control" id="name" placeholder="Recipe Name" defaultValue={editRecipe} required />
+              </div>
+              <div className="form-group">
+                <label for="ingredients">Ingredients</label>
+                <input type="text" ref="newIngredients" className="form-control" id="ingredients" placeholder="Enter Ingredients,Separated,By,Commas" defaultValue={editIngredient} required />
+              </div>
+            </form>
+          </Modal.Body>
+          <Modal.Footer>
+            <Button className="btn btn-primary" data-dismiss="modal" onClick={this.add}>Submit</Button>
+            <Button className="btn btn-default" onClick={this.close}>Close</Button>
+          </Modal.Footer>
+        </Modal>
+    <div className="panelArea">
+        {
+          this.state.recipeList.map(this.eachRecipe)
+        }
+    </div>
+        </div>
+        </div>
+      );
+    }
+});
+
+ReactDOM.render(
+  <Recipes />,
+  document.getElementById('master')
+)

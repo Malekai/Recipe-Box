@@ -1,0 +1,26 @@
+body {
+  background: #001e37;
+  text-align: center;
+  font-family: roboto;
+}
+body .panel {
+  width: 30%;
+  display: inline-block;
+  margin-left: 2%;
+}
+body .panel .panel-heading {
+  background: #ffae00;
+}
+body .panel .panel-heading h3 {
+  color: white;
+}
+body .panelArea {
+  margin-top: 2%;
+}
+body .btn {
+  margin-left: 25px;
+  margin-top: 2%;
+}
+body .btn-sm {
+  margin-left: 2%;
+}
